@@ -14,7 +14,7 @@ function addSpecial(src, dst) {
 
   Object.entries(src).forEach(([k,v])=> {
     if ((k === 'dmgbonus') || (k === 'rangedmgbonus')) dst[k] = (dst[k] || 0) + v
-    else if (k === 'multishot_dmg_inc_ratio') dst[k] = dst[k] > 1 ? (dst[k] || 1) + v - 1 : v
+    else if (k === 'multishot_dmg_inc_bonus') dst[k] = (dst[k] > 1) ? ((dst[k] || 1) + v - 1) : v
     else dst[k] = v
   })
 
@@ -276,7 +276,7 @@ function getStatsFromGearPieces(gear) {
     }
 
     return acc
-  }, { stats: {}, auras: {}, special: { multishot_dmg_inc_ratio: 1 } } )
+  }, { stats: {}, auras: {}, special: { multishot_dmg_inc_bonus: 0 } } )
 
   const result = getSetBonuses(setPieces)
   mergeResults(gearResults, result)

@@ -5,14 +5,13 @@
 const HitRatingRatio = 15.77; // 32.79 at 80
 const CritRatingRatio = 22.08; // 45.91 at 80
 const HasteRatingRatio = 15.77; // 32.79 at 80
-const ArPRatingRatio = 5.92; // 14 at 80
+const ArPRatingRatio = 7; // 14 at 80
 const AgiToCrit = 40; // 83.33 at 80
 const IntToCrit = 80; // 166.6667 at 80
 const BaseCritChance = -1.53;
 const BaseHitChance = 0;
 const CritPenalty = -3;
 const CritAuraPenalty = -1.8;
-const HitPenalty = -1;
 const ExpertiseRatio = 3.9423081875; // 8.1974973675 at 80 
 const GlanceDmgReduction = 0.75;
 const GlanceChance = 24;
@@ -20,6 +19,9 @@ const QuiverSpeed = 1.15;
 const BaseRegen = 0.009327;
 const BaseMana = 3383; // 5046 at 80
 const ExpertiseReduction = 0.25;
+const BaseMagicMiss = 16;
+const BasePhysicalMiss = 8;
+const PartialResistRate = 14.5;
 
 // initialize stat variables
 var RangeCritRating = 0;
@@ -49,7 +51,9 @@ var ExpertiseRating = 0;
 var Mana = 0;
 var MeleeCritDamage = 2;
 var RangeCritDamage = 2;
+var SpecialCritDamage = 2;
 var fiveSecRulemp5 = 0;
+var pet_special_crit = 0;
 
 var currentMana = 0;
 var BerserkStartHP = 100;
@@ -67,8 +71,10 @@ var combatMAP = 0;
 var combatdmgmod = 1;
 var physdmgmod = 1;
 var magdmgmod = 1;
-var naturedmgmod = 1;
+var bleeddmgmod = 1;
 var haste = 1;
+var PlyrArmorReduc = 1;
+var PetArmorReduc = 1;
 
 // stat modifiers
 var strmod = 1;
@@ -95,7 +101,14 @@ var useAverages = false;
 var range_wep = {};
 var mainhand_wep = {};
 var consumestats = {};
-var target = {};
+var target = {
+   armor: 10463,
+   level: 83,
+   name: "Level 83 10463",
+   phase: 1,
+   resilience: 0,
+   type: "Humanoid"
+};
 var currentgear = {auras:{0:{}}, stats:{},special:{}};
 const custom = {
    str: 0,
@@ -154,55 +167,55 @@ var talents = {
    thick_hide: 0,// -
    imp_ress_pet: 2, // - 
    pathfinding: 0,// -
-   aspect_mast: 1,
-   unleash_fury: 1.2, // -
+   aspect_mast: 0.1, // ---
+   unleash_fury: 1.15, //
    imp_mend_pet: 1,// -
    ferocity: 10, // 
    spirit_bond: 0,// -
    intimidation: 1,// -
-   bestial_disc: 2, // -
-   animal_handler: 10, // 
+   bestial_disc: 2, //
+   animal_handler: 1.1, // 
    frenzy: 4, //
    ferocious_insp: 1.03, //
    bestial_wrath: 1, //
-   catlike_reflex: 0, 
+   catlike_reflex: 0, //
    invigoration: 0, //
    serp_swift: 1.2, // 
-   longevity: 3,
+   longevity: 3, //
    beast_within: 1, // 
-   cobra_strike: 60,
-   kindred_spirit: 1.2,
-   beast_mast: 1,
+   cobra_strike: 0.60, //
+   kindred_spirit: 1.2, //
+   beast_mast: 1, 
    imp_conc_shot: 0,// -
-   focus_aim: 3,
-   lethal_shots: 5,
-   careful_aim: 0,
-   imp_hunter_mark: 1,
-   mortal_shots: 1.3,
-   GftT: 50,
-   imp_arc_shot: 1,
+   focus_aim: 3, //
+   lethal_shots: 5, //
+   careful_aim: 0, //
+   imp_hunter_mark: 1, //
+   mortal_shots: 1.3, //
+   GftT: 50, // 
+   imp_arc_shot: 1, // 
    aimed_shot: 1,
-   rapid_killing: 0,
-   imp_stings: 1,
-   efficiency: 1,
+   rapid_killing: 0, //
+   imp_stings: 1, //
+   efficiency: 1, // ---
    conc_barrage: 0,// -
-   readiness: 0,
-   barrage: 1,
-   combat_exp: 0,
-   ranged_weap_spec: 1, 
-   pierce_shot: 0,
+   readiness: 0, //
+   barrage: 1, //
+   combat_exp: 0, //
+   ranged_weap_spec: 1, //
+   pierce_shot: 0, 
    trueshot_aura: 1, //
-   imp_barrage: 0,
-   master_marksman: 0,
-   rapid_recup: 0,
-   wild_quiver: 0,
+   imp_barrage: 0, //
+   master_marksman: 0, //
+   rapid_recup: 0, //
+   wild_quiver: 0, //
    silencing_shot: 0,
-   imp_steady_shot: 0,
-   mark_death: 1,
+   imp_steady_shot: 0, //
+   mark_death: 0, //
    chimera_shot: 0,
-   imp_tracking: 1.02,
+   imp_tracking: 1.02, //
    hawk_eye: 0,// -
-   savage_strikes: 0,
+   savage_strikes: 0, //
    surefooted: 0,// -
    entrapment: 0,// -
    trap_mastery: 0,
@@ -237,15 +250,15 @@ function checkWeaponType(){
    let equippedMHType = MELEE_WEAPONS[gear.mainhand.id].type;
    // check for gun and dwarf, or bow and troll
    if ((equippedRangeType === 'Gun' && selectedRace === 1) || (equippedRangeType === 'Bow' && selectedRace === 4)) {
-      races[selectedRace].critchance = 1;
+      races[selectedRace][level].critchance = 1;
    } else {
-      races[selectedRace].critchance = 0;
+      races[selectedRace][level].critchance = 0;
    }
    // check for axe and orc
    if (equippedMHType === 'axe' && selectedRace === 3) {
-      races[selectedRace].expertise = 5;
+      races[selectedRace][level].expertise = 5;
    } else {
-      races[selectedRace].expertise = 0;
+      races[selectedRace][level].expertise = 0;
    }
    // disable offhand if two hand selected
    offhandDisabled = (MELEE_WEAPONS[gear.mainhand.id].hand === 'Two') ? true:false; 
@@ -269,52 +282,52 @@ function addBuffs(){
 // initialize base stats - called when talents, gear/enchants, static buffs/consumes, race are changed
 function calcBaseStats() {
 
-  let slaying = 1;
+  let imp_tracking = 1;
   let racialmod = 1;
   if (target.type === 'Beast'){
-      slaying = talents.monster_slaying;
+      imp_tracking = talents.imp_tracking;
       racialmod = (selectedRace === 4) ? 1.05 : 1;
   } else if ((target.type !== 'Unknown') || (target.type !== 'Mechanical') || (target.type !== 'Other')){
-      slaying = talents.imp_tracking;
+      imp_tracking = talents.imp_tracking;
   }
   let group_dmg_mod = (talents.ferocious_insp > 0) ? talents.ferocious_insp : 1;
-  dmgmod = (1 + talents.focused_fire / 100) * slaying * racialmod * group_dmg_mod;
-  rangedmgmod = dmgmod * (talents.ranged_weap_spec);
+  dmgmod = (1 + talents.focused_fire / 100) * imp_tracking * racialmod * group_dmg_mod;
+  rangedmgmod = dmgmod * (1 + Math.floor(talents.ranged_weap_spec * 100) / 100);
 
-  let tsa_ap = (talents.trueshot_aura > 1) ? 1.1 : 1;
+  let tsa_ap = (talents.trueshot_aura > 1) ? 1 : 1; // fixme
 
   strmod = selectedbuffs.special.kingsMod;
-  agimod = selectedbuffs.special.kingsMod * (1 + talents.combat_exp / 100) * talents.light_reflexes;
-  stammod = selectedbuffs.special.kingsMod;
-  intmod = selectedbuffs.special.kingsMod * (1 + talents.combat_exp * 3 / 100);
+  agimod = selectedbuffs.special.kingsMod * talents.combat_exp * talents.light_reflexes * (1 + talents.hunt_party);
+  stammod = selectedbuffs.special.kingsMod * talents.survivalist;
+  intmod = selectedbuffs.special.kingsMod * talents.combat_exp;
   spimod = selectedbuffs.special.kingsMod;
 
   // Main Stats
-  Str  = Math.floor((GearStats.Str + BuffStats.Str + EnchantStats.Str + races[selectedRace].str + custom.str) * strmod);
-  Agi  = Math.floor((GearStats.Agi + BuffStats.Agi + EnchantStats.Agi + races[selectedRace].agi + custom.agi) * agimod);
-  Stam = Math.floor((GearStats.Stam + BuffStats.Stam + EnchantStats.Stam + races[selectedRace].sta) * stammod);
-  Int  = Math.floor((GearStats.Int + BuffStats.Int + EnchantStats.Int + races[selectedRace].int + custom.int) * intmod);
-  Spi  = Math.floor((GearStats.Spi + BuffStats.Spi + EnchantStats.Spi + races[selectedRace].spi) * spimod);
+  Str  = Math.floor((GearStats.Str + BuffStats.Str + EnchantStats.Str + races[selectedRace][level].str + custom.str) * strmod);
+  Agi  = Math.floor((GearStats.Agi + BuffStats.Agi + EnchantStats.Agi + races[selectedRace][level].agi + custom.agi) * agimod);
+  Stam = Math.floor((GearStats.Stam + BuffStats.Stam + EnchantStats.Stam + races[selectedRace][level].sta) * stammod);
+  Int  = Math.floor((GearStats.Int + BuffStats.Int + EnchantStats.Int + races[selectedRace][level].int + custom.int) * intmod);
+  Spi  = Math.floor((GearStats.Spi + BuffStats.Spi + EnchantStats.Spi + races[selectedRace][level].spi) * spimod);
 
-  mapmod = (1 + Stam * talents.hunt_vs_wild) * tsa_ap * 1;
-  rapmod = (1 + Stam * talents.hunt_vs_wild) * tsa_ap * 1;
+  mapmod = (1 + Stam * talents.hunt_vs_wild) * tsa_ap;
+  rapmod = (1 + Stam * talents.hunt_vs_wild) * tsa_ap;
   // Attack Power
-  let hawkAP = 155
-  BaseMAP = (GearStats.MAP + BuffStats.MAP + EnchantStats.MAP + Agi + Str + races[selectedRace].mAP + custom.MAP) * mapmod;
+  let hawkAP = (level == 70) ? 0 * (1 + talents.aspect_mast * 3) : 300 * (1 + talents.aspect_mast * 3);
+  BaseMAP = (GearStats.MAP + BuffStats.MAP + EnchantStats.MAP + Agi + Str + races[selectedRace][level].mAP + custom.MAP) * mapmod;
   // flat 300 added for Aspect of the Hawk - need to change later
-  BaseRAP = (hawkAP + GearStats.RAP + BuffStats.RAP + EnchantStats.RAP + Agi + races[selectedRace].rAP + Int * talents.careful_aim + custom.RAP) * rapmod;
-  
+  BaseRAP = (hawkAP + GearStats.RAP + BuffStats.RAP + EnchantStats.RAP + Agi + races[selectedRace][level].rAP + Int * talents.careful_aim + custom.RAP) * rapmod;
   // Crit rating and crit chance
    let critrating = GearStats.Crit + BuffStats.Crit + EnchantStats.Crit;
    MeleeCritRating = critrating + (currentgear.stats.MeleeCrit || 0) + custom.meleecrit;
    RangeCritRating = critrating + (currentgear.stats.RangeCrit || 0) + custom.rangecrit;
-   let crit = BaseCritChance + Agi / AgiToCrit + BuffStats.CritChance + talents.killer_instinct;
+   let crit = BaseCritChance + Agi / AgiToCrit + BuffStats.CritChance + talents.killer_instinct + talents.master_marksman * 100;
 
   MeleeCritChance = crit + MeleeCritRating / CritRatingRatio;
-  RangeCritChance = crit + RangeCritRating / CritRatingRatio + talents.lethal_shots + races[selectedRace].critchance;
+  RangeCritChance = crit + RangeCritRating / CritRatingRatio + talents.lethal_shots + races[selectedRace][level].critchance;
   
-  MeleeCritDamage = 2 * (currentgear.special.relentless_metagem_crit_dmg_inc * 1);
+  MeleeCritDamage = 1 + (2 * currentgear.special.relentless_metagem_crit_dmg_inc - 1);
   RangeCritDamage = 1 + (talents.mortal_shots) * (2 * currentgear.special.relentless_metagem_crit_dmg_inc - 1);
+  SpecialCritDamage = 1 + (talents.mortal_shots + talents.mark_death * 2) * (2 * currentgear.special.relentless_metagem_crit_dmg_inc - 1);
   // Hit rating and hit chance - split between ranged and melee because of hit scope and crit scope and racial
 
    let hitrating = GearStats.Hit + BuffStats.Hit + EnchantStats.Hit;
@@ -328,18 +341,17 @@ function calcBaseStats() {
   RangeHitChance = hit + RangeHitRating / HitRatingRatio;
 
 
-   let penalty = (RangeHitChance >= 1) ? HitPenalty:0; // include penalty here? assumes lvl 73 target
    let dw_penalty = 0;
    if (!offhandDisabled && (gear.offhand !== undefined)) {
       dw_penalty = (gear.offhand.id > 0) ? -19:0; // offhand penalty for dual wielding 
    } else { dw_penalty = 0; }
 
-  MeleeMissChance = Math.max(8 - MeleeHitChance - penalty - dw_penalty,0);
-  RaptorMissChance = Math.max(8 - MeleeHitChance - penalty,0);
-  RangeMissChance = Math.max(8 - RangeHitChance - penalty,0);
+  MeleeMissChance = Math.max(BasePhysicalMiss - MeleeHitChance - dw_penalty,0);
+  RaptorMissChance = Math.max(BasePhysicalMiss - MeleeHitChance,0);
+  RangeMissChance = Math.max(BasePhysicalMiss - RangeHitChance,0);
 
   // Expertise and Dodge - every 8.19 rating is 1 expertise, 1 expertise = 0.25% reduction rounded down to nearest integer
-  Expertise = Math.floor(GearStats.Exp / ExpertiseRatio + races[selectedRace].expertise + custom.expertise);
+  Expertise = Math.floor(GearStats.Exp / ExpertiseRatio + races[selectedRace][level].expertise + custom.expertise);
   DodgeChance = 6.5 - Expertise * ExpertiseReduction;
 
   ArPRating = GearStats.ArP + custom.arp;
@@ -347,7 +359,7 @@ function calcBaseStats() {
   // formula for spirit regen -> (5 * sqrt(intellect) * spirit * 0.009327) for hunters
   fiveSecRulemp5 = Math.floor(5 * (Math.sqrt(Int) * Spi * BaseRegen));
 
-  // base of 5046 always then add int
+  // base mana by level then add int
   Mana = BaseMana + (Int - 20) * 15 + 20;
   // initialize current Mana to Max mana
   currentMana = Mana;
@@ -409,17 +421,18 @@ function procMana(attack,result){
             tmp = 5000; // 50% chance
             roll = rng10k();
             if (tmp < roll) {
-               currentMana += 100;
+               let gain = Math.floor(2 / 100 * BaseMana)
+               currentMana += gain;
                if(combatlogRun) {
-                  combatlogarray[combatlogindex] = playertimeend.toFixed(3) + " - Player gains " + 100 + " Mana from Judgement of Wisdom";
+                  combatlogarray[combatlogindex] = playertimeend.toFixed(3) + " - Player gains " + gain + " Mana from Judgement of Wisdom";
                   combatlogindex++;
                }
             }
          }
          else { // adds 50 every time instead of 100 and rolls it when average is selected
-            currentMana += 50;
+            currentMana += Math.floor(1 / 100 * BaseMana);
             if(combatlogRun) {
-               combatlogarray[combatlogindex] = playertimeend.toFixed(3) + " - Player gains " + 50 + " Mana from Judgement of Wisdom";
+               combatlogarray[combatlogindex] = playertimeend.toFixed(3) + " - Player gains " + Math.floor(1 / 100 * BaseMana) + " Mana from Judgement of Wisdom";
                combatlogindex++;
             }
          }
@@ -456,19 +469,25 @@ function procMana(attack,result){
 function updateMana() {
    // spirit tick gain (if no casting condition)
    let spiregen = 0;
-   if ((steptimeend > 5 * Math.ceil(prevtimeend / 5)) && recentcast === false) {
+   if (recentcast === false) {
       //spiregen = fiveSecRulemp5; 
    } 
    else { spiregen = 0; 
    }
 
    // mp5 tick gain
-   if (steptimeend > 5 * Math.ceil(prevtimeend / 5)) {
-      currentMana += ManaPer5 + spiregen;
-      if(combatlogRun) {
-         //combatlogarray[combatlogindex] = steptimeend.toFixed(3) + " - Player regens " + (ManaPer5 + spiregen) + " Mana";
-         //combatlogindex++;
+   currentMana += ManaPer5 + spiregen;
+   if(combatlogRun) {
+      //combatlogarray[combatlogindex] = steptimeend.toFixed(3) + " - Player regens " + (ManaPer5 + spiregen) + " Mana";
+      //combatlogindex++;
+   }
+
+   if (auras.rapid?.timer > 0){
+      if (steptimeend > 3 * Math.ceil(prevtimeend / 3)) {
+         currentMana += Mana * talents.rapid_recup;
+         //console.log('rapid recup '+ Mana * talents.rapid_recup)
       }
+      
    }
 
    currentMana = Math.min(currentMana, Mana);
@@ -479,11 +498,9 @@ function updateMana() {
 // handling for dynamic armor reduction 
 function updateArmorReduction() {
    let arp = ArPRating;
-   let debuffarp = 0;
+   let debuffarp = 1;
    let armorPenReduc = 0;
-   let targetlevel = 73;
    // formula consts for level 60 or higher
-   let target_const = 400 + 85 * targetlevel + 4.5 * 85 * (targetlevel-59);
    let attacker_const = 400 + 85 * level + 4.5 * 85 * (level-59);
    
    if (Object.values(arp_auras).length !== 0) {
@@ -497,23 +514,23 @@ function updateArmorReduction() {
          return acc + arpval
       }, 0)
    }
-   arp = Math.min(ArmorPenCap, arp);
+   arp = Math.min(ArPRatingCap, arp);
    armorPenReduc = arp / ArPRatingRatio / 100;
 
    // armor debuffs
-   debuffarp += (debuffs.faeriefire.timer > 0 && !debuffs.faeriefire.inactive) ? debuffs.faeriefire.arp : 0;
+   debuffarp *= (debuffs.faeriefire.timer > 0 && !debuffs.faeriefire.inactive) ? ( 1 - debuffs.faeriefire.arp ) : 1;
    if (debuffs.expose.timer > 0 && !debuffs.expose.inactive) {
-      debuffarp += debuffs.expose.arp;
+      debuffarp *= 1 - debuffs.expose.arp;
    }
    else if (debuffs.sunder.timer > 0 && !debuffs.sunder.inactive) {
-      debuffarp += debuffs.sunder.stacks * debuffs.sunder.arp;
+      debuffarp *= 1 - debuffs.sunder.stacks * debuffs.sunder.arp;
    }
    else {debuffs.sunder.stacks = 0;}
-   let debuffArmor = target.armor * (1 - debuffarp);
+   let debuffArmor = target.armor * (debuffarp);
 
-   let armor_cap = (debuffArmor + target_const) / 3;
-   let playerRemainingArmor = debuffArmor - Math.min(target.armor, armor_cap) * armorPenReduc;
-
+   let armor_cap = (debuffArmor + attacker_const) / 3;
+   let playerRemainingArmor = debuffArmor - Math.min(debuffArmor, armor_cap) * armorPenReduc;
+   //console.log(debuffArmor)
    // target armor reduction calculation
    PlyrArmorReduc = playerRemainingArmor / (playerRemainingArmor + attacker_const);
    PetArmorReduc = debuffArmor / (debuffArmor + attacker_const);
@@ -550,7 +567,7 @@ function updateAP() {
    if (target.type === 'Demon'){
       targetAP += (playerconsumes.battle_elixir === 9224) ? 265 : 0;
    }
-   // Hunter's mark - RAP 500
+   // Hunter's mark
    let HM_rap = (debuffs.hm.timer > 0 && !debuffs.hm.inactive) ? debuffs.hm.rap : 0;
 
    // HM - bonus from talents
@@ -566,7 +583,6 @@ function updateAP() {
    // totals AP - HM and targetAP do not buff pet
    combatRAP += (bonusAP + targetAP + HM_rap) * rapmod;
    combatMAP += (bonusAP + targetAP) * mapmod;
-
    //console.log("rap: " + combatRAP);
    // returns AP used in the pet function call
    return bonusAP * rapmod;
@@ -630,12 +646,17 @@ function updateDmgMod() {
    combatdmgmod = 1;
    physdmgmod = 1;
    magdmgmod = 1;
+   bleeddmgmod = 1;
+   let spell_ranged = spell !== 'raptorstrike' && spell !== 'melee' && spell !== 'mongoosebite';
 
-   if(!!auras.beastwithin && auras.beastwithin.timer > 0) { combatdmgmod *= 1.1;} // beast within
-   
-   if((debuffs.bloodfrenzy.timer > 0) && !debuffs.bloodfrenzy.inactive) { physdmgmod *= 1.04; } // blood frenzy
+   if(!!auras.beastwithin && auras.beastwithin.timer > 0) { combatdmgmod *= 1 + auras.beastwithin.effect.dmgmod / 100;} // beast within
+   if(auras.cullingherd?.timer > 0) combatdmgmod *= pet_talents.cull_herd;
+   if((debuffs.bloodfrenzy.timer > 0) && !debuffs.bloodfrenzy.inactive) { physdmgmod *= debuffs.bloodfrenzy.dmgbonus; } // blood frenzy
+   if(debuffs.hm.timer > 0 && !debuffs.hm.inactive && talents.mark_death > 0 && spell_ranged) combatdmgmod *= (1 + talents.mark_death);
    // special mods for non-physical dmg
-   if((debuffs.curseofele.timer > 0) && !debuffs.curseofele.inactive) { magdmgmod *= 1.13 } // curse of ele
+   if((debuffs.curseofele.timer > 0) && !debuffs.curseofele.inactive) { magdmgmod *= debuffs.curseofele.dmgbonus } // curse of ele
+   if(debuffs.mangle.timer > 0) { magdmgmod *= debuffs.mangle.dmgbonus } // curse of ele
+   
    return;
 }
 
@@ -726,13 +747,37 @@ function rollSpell(attack,combatCrit,specialcrit) {
 function rollMagicSpell(){
    let tmp = 0;
    let roll = rng10k();
-   let miss = 17;
+   let miss = BaseMagicMiss;
    let crit = 3.6 + (Int / IntToCrit); // spell crit
    tmp += miss * 100;
    if (roll < tmp) return RESULT.MISS;
-   tmp += 14.5 * 100; // partial resist rate approx. 14.5% based on log data at 0 resistance
+   tmp += PartialResistRate * 100; // partial resist rate approx. 14.5% based on log data at 0 resistance
    if (roll < tmp) return RESULT.PARTIAL;
-   tmp += (100 - miss - 14.5) * crit; // pseudo 2 roll
+   tmp += (100 - miss - PartialResistRate) * crit; // pseudo 2 roll
+   if (roll < tmp) return RESULT.CRIT;
+   return RESULT.HIT;
+}
+
+function rollMagicDoT(hit, type){
+   let tmp = 0;
+   let roll = rng10k();
+   let miss = (type === 'physical') ? Math.max(0, BasePhysicalMiss - hit) : Math.max(0, BaseMagicMiss - hit);
+   tmp += miss * 100;
+   if (roll < tmp) return RESULT.MISS;
+   return RESULT.HIT;
+}
+
+function rollDamageOverTime(hit, type){
+   let tmp = 0;
+   let roll = rng10k();
+   let miss = (type === 'physical') ? Math.max(0, BasePhysicalMiss - hit) : Math.max(0, BaseMagicMiss - hit);
+   let partial = (type !== 'physical' && type !== 'bleed') ? PartialResistRate : 0;
+   let crit = 0; // temp 0 until I do dots that crit (explosive, serpent sting)
+   tmp += miss * 100;
+   if (roll < tmp) return RESULT.MISS;
+   tmp += partial * 100;
+   if (roll < tmp) return RESULT.PARTIAL;
+   tmp += (100 - miss - partial) * crit; // pseudo 2 roll
    if (roll < tmp) return RESULT.CRIT;
    return RESULT.HIT;
 }
@@ -750,7 +795,7 @@ function attackMainhand(meleeAP) {
    else if (result === RESULT.CRIT) {
       dmg = meleeStrikeCalc(mainhand_wep, meleeAP); // calc damage
       dmg *= MeleeCritDamage;
-      proccrit(0, attack);
+      proccrit(0, attack, 'melee');
    }
    else if (result === RESULT.GLANCE) {
       dmg = meleeStrikeCalc(mainhand_wep, meleeAP); // calc damage
@@ -777,51 +822,87 @@ function attackMainhand(meleeAP) {
 /** attack with auto shot */
 function attackRange(type) {
 
+   updateAgi();
+   updateAP();
+   updateDmgMod();
    if (type === undefined) type = 'autoshot';
    let attack = 'ranged';
    let combatCrit = updateCritChance(attack);
 
    let dmg = 0;
-   let result = rollRangeWep(combatCrit); // check attack table
-   spellResultSum(result, type);
-   if (result === RESULT.HIT) {
+   let result = 0;
+   let dmg_type = '';
+   let spellname = '';
+
+   if(type === 'wild_quiver') {
+      result = rollRangeWep(combatCrit); // check attack table
+      spellResultSum(result, type);
+      if (result === RESULT.HIT) {
+         dmg = wildQuiverCalc(range_wep,combatRAP); // calc damage
+      }
+      else if (result === RESULT.CRIT) {
+         dmg = wildQuiverCalc(range_wep,combatRAP);
+         dmg *= MeleeCritDamage; // double damage without mortal shots
+         proccrit(0, attack, 'wild_quiver');
+      }
+      spellname = 'Wild Quiver';
+      dmg_type = 'magic';
+   }
+   else if(type === 'zods_repeat') {
+      result = rollRangeWep(combatCrit); // check attack table
+      spellResultSum(result, type);
+      if (result === RESULT.HIT) {
+         dmg = ScatterSilenceShotCalc(range_wep,combatRAP); // 50% damage formula
+      }
+      else if (result === RESULT.CRIT) {
+         dmg = ScatterSilenceShotCalc(range_wep,combatRAP); // 50% damage formula
+         dmg *= MeleeCritDamage; // double damage without mortal shots
+         proccrit(0, attack, 'zods_repeat');
+      }
+      spellname = 'Zod\'s Repeating Shot';
+      dmg_type = 'physical';
+   }
+   else {
+      result = rollRangeWep(combatCrit); // check attack table
+      spellResultSum(result, type);
+      if (result === RESULT.HIT) {
          dmg = autoShotCalc(range_wep,combatRAP); // calc damage
-   }
-   else if (result === RESULT.CRIT) {
+      }
+      else if (result === RESULT.CRIT) {
          dmg = autoShotCalc(range_wep,combatRAP);
-         dmg *= RangeCritDamage;
-         proccrit(0, attack);
+         dmg *= MeleeCritDamage; // double damage without mortal shots
+         proccrit(0, attack, 'autoshot');
+      }
+      spellname = 'Auto Shot';
+      dmg_type = 'physical';
+      procauto();
+      autocount++;
    }
-   let done = 0;
-   if (type === 'wild_quiver') {
-      done = dealdamage(dmg,result, 'magic') * 0.8;
    
-      totaldmgdone += done;
+   
+   let done = dealdamage(dmg,result, dmg_type);
+   
+   totaldmgdone += done;
+   if (type === 'wild_quiver'){
       wild_quiverdmg += done;
    } else if (type === 'zods_repeat'){
-      done = dealdamage(dmg,result) * 0.5;
-   
-      totaldmgdone += done;
       zodsdmg += done;
    } else {
-      done = dealdamage(dmg,result);
-   
-      totaldmgdone += done;
       autodmg += done;
    }
-   
-   procauto();
+
    procattack(attack,result);
-   procMana(attack,result); // expensiveish
+   //procMana(attack,result); // expensiveish
    //magicproc(attack);
 
    if(combatlogRun) {
-      combatlogarray[combatlogindex] = playertimeend.toFixed(3) + " - Player Auto Shot " + RESULTARRAY[result] + " for " + done + ". RAP => " + combatRAP;
+      combatlogarray[combatlogindex] = nextauto.toFixed(3) + " - Player " + spellname + " " + RESULTARRAY[result] + " for " + done + ". RAP => " + combatRAP;
       combatlogindex++;
    }
-   autocount++;
+
    return;
 }
+
 /** attack with a spell (yellow) roll for dmg, deal dmg, and trigger any procs */
 function attackSpell(spell,spellcost) {
 
@@ -831,14 +912,16 @@ function attackSpell(spell,spellcost) {
    let attack = "";
    let specialcrit = 0;
    let cost = 0;
+   let mastermarksreduc = 1 - talents.master_marksman * 5;
+   let impsteadyreduc = (auras.imp_steady_shot?.timer > 0) ? 0.8 : 1;
 
    if (spell === 'steadyshot'){
       attack = 'ranged';
-      cost = Math.floor(spellcost * talents.efficiency * beastwithinreduc);
+      cost = Math.floor(spellcost * (1 - talents.efficiency) * beastwithinreduc * mastermarksreduc);
       currentMana -= cost;
       
       combatCrit = updateCritChance(attack);
-
+      specialcrit = talents.surv_instincts;
       result = rollSpell(attack, combatCrit, specialcrit); // check attack table
 
       spellResultSum(result, spell);
@@ -847,15 +930,15 @@ function attackSpell(spell,spellcost) {
       }
       else if (result === RESULT.CRIT) {
          dmg = steadyShotCalc(range_wep,combatRAP);
-         dmg *= RangeCritDamage;
-         proccrit(cost, attack);   
+         dmg *= SpecialCritDamage;
+         proccrit(cost, attack, spell, dmg);   
       }
       procsteady(attack);
       steadycount++;
    } 
    else if (spell === 'multishot') {
       attack = 'ranged';
-      cost = Math.floor(spellcost * talents.efficiency * beastwithinreduc);
+      cost = Math.floor(spellcost * (1 - talents.efficiency) * beastwithinreduc);
       currentMana -= cost;
 
       combatCrit = updateCritChance(attack);
@@ -868,17 +951,58 @@ function attackSpell(spell,spellcost) {
       else if (result === RESULT.CRIT) {
          dmg = multiShotCalc(range_wep,combatRAP);
          dmg *= RangeCritDamage;
-         proccrit(cost, attack);
+         proccrit(cost, attack, spell);
       }
 
       multicount++;
    }
-   else if (spell === 'arcaneshot') {
+   else if (spell === 'aimedshot') {
       attack = 'ranged';
-      cost = Math.floor(spellcost * talents.efficiency * beastwithinreduc);
+      cost = Math.floor(spellcost * (1 - talents.efficiency) * beastwithinreduc * mastermarksreduc * impsteadyreduc);
       currentMana -= cost;
 
       combatCrit = updateCritChance(attack);
+      let trueshotglyph = (!!glyphs.trueshot_aura) ? glyphs.trueshot_aura.bonus : 0;
+      specialcrit = talents.imp_barrage + trueshotglyph;
+      result = rollSpell(attack, combatCrit, specialcrit); // check attack table
+      spellResultSum(result, spell);
+      if (result === RESULT.HIT) {
+         dmg = aimedShotCalc(range_wep,combatRAP); // calc damage
+      }
+      else if (result === RESULT.CRIT) {
+         dmg = aimedShotCalc(range_wep,combatRAP);
+         dmg *= SpecialCritDamage;
+         proccrit(cost, attack, spell, dmg);
+      }
+      if (impsteadyreduc !== 1) auras.imp_steady_shot.timer = 0;
+      //aimedcount++;
+   }
+   else if (spell === 'chimerashot') {
+      attack = 'ranged';
+      cost = Math.floor(spellcost * (1 - talents.efficiency) * beastwithinreduc * mastermarksreduc * impsteadyreduc);
+      currentMana -= cost;
+
+      combatCrit = updateCritChance(attack);
+      result = rollSpell(attack, combatCrit, specialcrit); // check attack table
+      spellResultSum(result, spell);
+      if (result === RESULT.HIT) {
+         dmg = chimeraShotCalc(range_wep,combatRAP); // calc damage
+      }
+      else if (result === RESULT.CRIT) {
+         dmg = chimeraShotCalc(range_wep,combatRAP);
+         dmg *= SpecialCritDamage;
+         proccrit(cost, attack, spell, dmg);
+      }
+      if (impsteadyreduc !== 1) auras.imp_steady_shot.timer = 0;
+      //chimeracount++;
+   }
+   else if (spell === 'arcaneshot') {
+      attack = 'ranged';
+      cost = Math.floor(spellcost * (1 - talents.efficiency) * beastwithinreduc * impsteadyreduc);
+      currentMana -= cost;
+
+      combatCrit = updateCritChance(attack);
+      specialcrit = talents.surv_instincts;
       result = rollSpell(attack, combatCrit, specialcrit); // check attack table
       spellResultSum(result, spell);
       if (result === RESULT.HIT) {
@@ -886,15 +1010,15 @@ function attackSpell(spell,spellcost) {
       }
       else if (result === RESULT.CRIT) {
          dmg = arcaneShotCalc(range_wep,combatRAP);
-         dmg *= RangeCritDamage;
-         proccrit(cost, attack);
+         dmg *= SpecialCritDamage;
+         proccrit(cost, attack, spell);
       }
-
+      if (impsteadyreduc !== 1) auras.imp_steady_shot.timer = 0;
       arcanecount++;
    }
    else if (spell === 'raptorstrike') {
       attack = 'melee';
-      cost = Math.floor(spellcost * (1 - talents.resourcefulness * 0.2) * beastwithinreduc);
+      cost = Math.floor(spellcost * (1 - talents.resourcefulness) * beastwithinreduc);
       currentMana -= cost;
 
       combatCrit = updateCritChance(attack);
@@ -907,13 +1031,13 @@ function attackSpell(spell,spellcost) {
       else if (result === RESULT.CRIT) {
          dmg = raptorStrikeCalc(mainhand_wep,combatMAP); // calc damage
          dmg *= MeleeCritDamage;
-         proccrit(cost, attack);
+         proccrit(cost, attack, spell);
       }
 
       raptorcount++;
    }
-
-   let done = dealdamage(dmg,result,spell);
+   
+   let done = dealdamage(dmg,result,USED_SPELLS[spell].type);
    totaldmgdone += done;
    if (spell === 'steadyshot') {
       steadydmg += done;
@@ -927,11 +1051,11 @@ function attackSpell(spell,spellcost) {
 
 
    procattack(attack,result);
-   procMana(attack,result); // expensiveish
+   //procMana(attack,result); // expensiveish
    //magicproc(attack);
 
    if(combatlogRun) {
-      combatlogarray[combatlogindex] = playertimeend.toFixed(3) + " - Player " + SPELL_MAPPER[spell] + " " + RESULTARRAY[result] + " for " + done + ". RAP => " + combatRAP + ". Mana => " + currentMana;
+      combatlogarray[combatlogindex] = playertimeend.toFixed(3) + " - Player " + USED_SPELLS[spell].spell_name + " " + RESULTARRAY[result] + " for " + done + ". RAP => " + combatRAP + ". Mana => " + currentMana;
       combatlogindex++;
    }
    return;
@@ -944,29 +1068,38 @@ function cast(spell) {
    updateAP();
    updateDmgMod();
 
-   if(spell === 'autoshot'){
-      attackRange();
-   }
-   else if (spell === 'steadyshot'){
-      spellcost = SPELLS.steadyshot.cost;
+   if (spell === 'steadyshot'){
+      spellcost = USED_SPELLS.steadyshot.cost / 100 * BaseMana;
       attackSpell(spell,spellcost);
       recentcast = true;
       //console.log("gcd => " + (Math.round(currentgcd * 1000) / 1000));
    }
    else if (spell === 'multishot'){
-      spellcost = SPELLS.multishot.cost;
+      spellcost = USED_SPELLS.multishot.cost / 100 * BaseMana;
+      attackSpell(spell,spellcost);
+      recentcast = true;
+      //console.log("gcd => " + (Math.round(currentgcd * 1000) / 1000));
+   }
+   else if (spell === 'aimedshot'){
+      spellcost = USED_SPELLS.aimedshot.cost / 100 * BaseMana;
+      attackSpell(spell,spellcost);
+      recentcast = true;
+      //console.log("gcd => " + (Math.round(currentgcd * 1000) / 1000));
+   }
+   else if (spell === 'chimerashot'){
+      spellcost = USED_SPELLS.chimerashot.cost / 100 * BaseMana;
       attackSpell(spell,spellcost);
       recentcast = true;
       //console.log("gcd => " + (Math.round(currentgcd * 1000) / 1000));
    }
    else if (spell === 'arcaneshot'){
-      spellcost = SPELLS.arcaneshot.cost;
+      spellcost = USED_SPELLS.arcaneshot.cost / 100 * BaseMana;
       attackSpell(spell,spellcost);
       recentcast = true;
       //console.log("gcd => " + (Math.round(currentgcd * 1000) / 1000));
    }
    else if (spell === 'raptorstrike'){
-      spellcost = SPELLS.raptorstrike.cost;
+      spellcost = USED_SPELLS.raptorstrike.cost / 100 * BaseMana;
       attackSpell(spell,spellcost);
    }
    else if (spell === 'melee'){
@@ -976,20 +1109,20 @@ return;
 }
 
 /** final damage calculation after rolls */
-function dealdamage(dmg, result, spell) {
-   if (result != RESULT.MISS && result != RESULT.DODGE && spell !== 'arcaneshot' && spell !== 'magic') {
+function dealdamage(dmg, result, type) {
+   if (result != RESULT.MISS && result != RESULT.DODGE && type === 'physical') {
       // randomizes the result to be always ±1 damage as in-game results show even with fine light crossbow
       let mindmg = Math.floor(dmg * (1 - PlyrArmorReduc));
       let maxdmg = Math.ceil(dmg * (1 - PlyrArmorReduc));
       dmg = rng(mindmg,maxdmg);
-      
+      //console.log(mindmg + " - " + maxdmg)
       return dmg;
    } 
-   else if (spell === 'arcaneshot' || spell === 'magic') {
+   else if (result != RESULT.MISS && type !== 'physical') {
       let mindmg = Math.floor(dmg);
       let maxdmg = Math.ceil(dmg);
       dmg = rng(mindmg,maxdmg);
-
+      //console.log(type + ": " + mindmg + " - " + maxdmg)
       return dmg;
    }
    else {
@@ -998,9 +1131,26 @@ function dealdamage(dmg, result, spell) {
 }
 
 /** handling for procs by crits */
-function proccrit(cost, attack) {
+function proccrit(cost, attack, spell, dmg) {
 
    let roll = 0;
+
+   if(talents.cobra_strike > 0) {
+      if (spell === 'arcaneshot' || spell === 'steadyshot' || spell === 'killshot') {
+         pet_special_crit = 2;
+      }
+   }
+   if (talents.pierce_shot > 0) {
+      let type = (spell === 'chimerashot') ? 'nature' : 'physical'; 
+      if (spell === 'aimedshot' || spell === 'steadyshot' || spell === 'chimerashot') {
+         dotHandler('pierce_shot', 'player', true, type, dmg);
+         if(combatlogRun) {
+            combatlogarray[combatlogindex] = playertimeend.toFixed(3) + " - Target is affected by Piercing Shots.";
+            combatlogindex++;
+         }
+         //console.log("proc piercing shots")
+      }
+   }
 
    let trink1_has_aura = (Object.values(auras.trink1).length !== 0);
    let trink2_has_aura = (Object.values(auras.trink2).length !== 0);
@@ -1009,14 +1159,14 @@ function proccrit(cost, attack) {
    if (trink1_has_aura) {
       slot = 'trink1';
       // if effect is proc and cd is up verify proc type condition is met
-      if ((auras[slot].effect.is_proc && auras[slot].cd === 0 )){
+      if ((auras[slot].effect?.is_proc && auras[slot].cd === 0 )){
          if (auras[slot].effect.proc_type === 'Melee or Range Crit') rollTrinkProc(slot,attack);
       }
    }
    if (trink2_has_aura) {
       slot = 'trink2';
       // if effect is proc and cd is up verify proc type condition is met
-      if ((auras[slot].effect.is_proc && auras[slot].cd === 0 )){
+      if ((auras[slot].effect?.is_proc && auras[slot].cd === 0 )){
          if (auras[slot].effect.proc_type === 'Melee or Range Crit') rollTrinkProc(slot,attack);
       }
    }
@@ -1043,7 +1193,7 @@ function proccrit(cost, attack) {
    // go for the throat proc
    if(talents.GftT > 0 && attack === 'ranged'){
       let playercrit = true;
-      petUpdateFocus(playercrit);
+      procPetFocus(playercrit);
    }
    return;
 }
@@ -1061,7 +1211,7 @@ function procauto() {
 
    if (talents.wild_quiver > 0) {
       let roll = rng10k();
-      if (roll <= talents.wild_quiver * 100) {
+      if (roll <= talents.wild_quiver * 10000) {
          attackRange('wild_quiver');
       }
    }
@@ -1090,14 +1240,14 @@ function procsteady(attack) {
    if (trink1_has_aura) {
       slot = 'trink1';
       // if effect is proc and cd is up verify proc type condition is met
-      if ((auras[slot].effect.is_proc && auras[slot].cd === 0 )){
+      if ((auras[slot].effect?.is_proc && auras[slot].cd === 0 )){
          if (auras[slot].effect.proc_type === 'Steady') rollTrinkProc(slot,attack);
       }
    }
    if (trink2_has_aura) {
       slot = 'trink2';
       // if effect is proc and cd is up verify proc type condition is met
-      if ((auras[slot].effect.is_proc && auras[slot].cd === 0 )){
+      if ((auras[slot].effect?.is_proc && auras[slot].cd === 0 )){
          if (auras[slot].effect.proc_type === 'Steady') rollTrinkProc(slot,attack);
       }
    }
@@ -1105,9 +1255,9 @@ function procsteady(attack) {
       // imp steady shot
    if (!!auras.imp_steady_shot){
       let roll = rng10k(); 
-      auras.imp_steady_shot.timer = (roll <= auras.imp_steady_shot.effect.proc_chance * 100) ? auras.imp_steady_shot.effect.duration : auras.imp_steady_shot.timer;
-      if(auras.imp_steady_shot.timer === auras.imp_steady_shot.duration && combatlogRun) { 
-
+      auras.imp_steady_shot.timer = (roll <= talents.imp_steady_shot * 10000) ? auras.imp_steady_shot.effect.duration : auras.imp_steady_shot.timer;
+      if((auras.imp_steady_shot.timer === auras.imp_steady_shot.effect.duration) && combatlogRun) { 
+         
          combatlogarray[combatlogindex] = playertimeend.toFixed(3) + " - Player gains " + auras.imp_steady_shot.effect_name;
          combatlogindex++;
       }
@@ -1167,7 +1317,7 @@ function procattack(attack,result) {
          naarutrink = slot;
       }
       // if effect is proc and cd is up verify proc type condition is met
-      if ((auras[slot].effect.is_proc && auras[slot].cd === 0 )){
+      if ((auras[slot].effect?.is_proc && auras[slot].cd === 0 )){
          if ((auras[slot].effect.proc_type === 'Melee or Range') || 
                (success && (auras[slot].effect.proc_type === 'Melee or Range Hit'))) {
                
@@ -1185,7 +1335,7 @@ function procattack(attack,result) {
          naarutrink = slot;
       }
       // if effect is proc and cd is up verify proc type condition is met
-      if ((auras[slot].effect.is_proc && auras[slot].cd === 0 )){
+      if ((auras[slot].effect?.is_proc && auras[slot].cd === 0 )){
          if ((auras[slot].effect.proc_type === 'Melee or Range') || 
                (success && (auras[slot].effect.proc_type === 'Melee or Range Hit'))) {
                

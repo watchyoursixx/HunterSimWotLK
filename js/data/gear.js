@@ -78,7 +78,7 @@ const SETS = {
         abrv: 'gronnstalker',
         bonuses: {
          2: { viper_mana_gain_ratio: 0.05 },
-         4: { steady_shot_dmg_ratio: 0.1 }
+         4: { steady_shot_dmg_bonus: 0.1 }
         }
     },
     706: {
@@ -716,7 +716,7 @@ const BACKS = {
             RAP: 46,
             Crit: 20,
             Resil: 20,
-            ArP: 16
+            ArP: 17
         },
         Location: "Badge Reward",
         Phase: 4,
@@ -2859,7 +2859,7 @@ const HANDS = {
         name: "Gladiator's Chain Gauntlets",
         set: 586,
         special: {
-            multishot_dmg_inc_ratio: 1.05
+            multishot_dmg_inc_bonus: 0.05
         },
         stats: {
             Agi: 26,
@@ -3141,7 +3141,7 @@ const HANDS = {
         name: "Merciless Gladiator's Chain Gauntlets",
         set: 706,
         special: {
-            multishot_dmg_inc_ratio: 1.05
+            multishot_dmg_inc_bonus: 0.05
         },
         stats: {
             Agi: 30,
@@ -3261,7 +3261,7 @@ const HANDS = {
         name: "Vengeful Gladiator's Chain Gauntlets",
         set: 723,
         special: {
-            multishot_dmg_inc_ratio: 1.05
+            multishot_dmg_inc_bonus: 0.05
         },
         stats: {
             Agi: 33,
@@ -3384,7 +3384,7 @@ const HANDS = {
         name: "Brutal Gladiator's Chain Gauntlets",
         set: "-7",
         special: {
-            multishot_dmg_inc_ratio: 1.05
+            multishot_dmg_inc_bonus: 0.05
         },
         stats: {
             Agi: 37,
@@ -3404,7 +3404,7 @@ const HANDS = {
         name: "Stalker's Chain Gauntlets",
         set: 749,
         special: {
-            multishot_dmg_inc_ratio: 1.05
+            multishot_dmg_inc_bonus: 0.05
         },
         stats: {
             Agi: 21,
@@ -14251,7 +14251,7 @@ const WRISTS = {
             MAP: 64,
             RAP: 64,
             Crit: 17,
-            ArP: 16
+            ArP: 17
         },
         Location: "Sunwell",
         sockets: [

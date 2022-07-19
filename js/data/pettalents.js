@@ -410,8 +410,8 @@ function parsePetTalents(talentString) {
     return talents
 }
 
-const Ferocitypet = parsePetTalents('210001303000301011')
+const Ferocitypet = parsePetTalents('2100013030003') //210001303000301011
 pet_tree_type = 'cunning'
-const Cunningpet = parsePetTalents('2100002330000211001')
+const Cunningpet = parsePetTalents('21000023300002') // 2100002330000211001
 pet_tree_type = 'tenacity'
-const Tenacitypet = parsePetTalents('21300020020120111')
+const Tenacitypet = parsePetTalents('2130002002012') // 21300020020120111

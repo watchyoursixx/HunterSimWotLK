@@ -432,8 +432,7 @@ function damageResults(){
       raptor: {},
       melee: {},
       attack: {},
-      kc: {},
-      primary: {}
+      pet_special: {}
   };
   // steady
   simresults.steady.casts = (steadycount / iterations);
@@ -497,23 +496,15 @@ function damageResults(){
   simresults.attack.dodge = (spellresult.petattack.Dodge / petautocount) * 100;
   simresults.attack.avg = (petdmg.attackdmg / petautocount);
   simresults.attack.dps = (petdmg.attackdmg / sumduration);
-  // pet kill command
-  simresults.kc.casts = (petkccount / iterations);
-  simresults.kc.miss = (spellresult.killcommand.Miss / petkccount) * 100;
-  simresults.kc.crit = (spellresult.killcommand.Crit / petkccount) * 100;
-  simresults.kc.hit = (spellresult.killcommand.Hit / petkccount) * 100;
-  simresults.kc.dodge = (spellresult.killcommand.Dodge / petkccount) * 100;
-  simresults.kc.avg = (petdmg.kcdmg / petkccount);
-  simresults.kc.dps = (petdmg.kcdmg / sumduration);
   // pet primary
-  simresults.primary.casts = (petprimarycount / iterations);
-  simresults.primary.miss = (spellresult.primary.Miss / petprimarycount) * 100;
-  simresults.primary.crit = (spellresult.primary.Crit / petprimarycount) * 100;
-  simresults.primary.hit = (spellresult.primary.Hit / petprimarycount) * 100;
-  simresults.primary.dodge = (spellresult.primary.Dodge / petprimarycount) * 100;
-  simresults.primary.partial = (spellresult.primary.Partial / petprimarycount) * 100;
-  simresults.primary.avg = (petdmg.primarydmg / petprimarycount);
-  simresults.primary.dps = (petdmg.primarydmg / sumduration);
+  simresults.pet_special.casts = (petspecialcount / iterations);
+  simresults.pet_special.miss = (spellresult.pet_special.Miss / petspecialcount) * 100;
+  simresults.pet_special.crit = (spellresult.pet_special.Crit / petspecialcount) * 100;
+  simresults.pet_special.hit = (spellresult.pet_special.Hit / petspecialcount) * 100;
+  simresults.pet_special.dodge = (spellresult.pet_special.Dodge / petspecialcount) * 100;
+  simresults.pet_special.partial = (spellresult.pet_special.Partial / petspecialcount) * 100;
+  simresults.pet_special.avg = (petdmg.petspecialdmg / petspecialcount);
+  simresults.pet_special.dps = (petdmg.petspecialdmg / sumduration);
   
   let newsimresults = Object.keys(simresults).map(key => ({action: key, results: simresults[key]}));
   let sortedsimresults = newsimresults.sort(compare);
@@ -573,7 +564,7 @@ function resultCountInitialize() {
       spellresult[spellname].Crit = 0;
       spellresult[spellname].Miss = 0;
       
-      if (spellname === 'primary') {
+      if (spellname === 'pet_special') {
           spellresult[spellname].Partial = 0;
       }
       if (spellname === 'primary' || 'petattack' || 'killcommand' || 'raptorstrike' || 'melee') {

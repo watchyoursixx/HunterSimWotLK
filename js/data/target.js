@@ -48,6 +48,14 @@ var targetData = (function() {
         type: Target_Types.HUMANOID,
         level: 73
       },
+      4: {
+        name: 'Level 70 6792',
+        armor: 6792,
+        phase: 1,
+        resilience: 0,
+        type: Target_Types.MECHANICAL,
+        level: 70
+      },
   }
 
   var target = undefined;

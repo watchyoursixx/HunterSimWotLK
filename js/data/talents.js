@@ -50,13 +50,14 @@ const BM_TREE = [
       name: 'Aspect Mastery',
       abrv: 'aspect_mast',
       max: 1,
+      per_point: 10 / 100
     },
     {
       name: 'Unleashed Fury',
       abrv: 'unleash_fury',
       max: 5,
       is_modifier: true,
-      per_point: 4/100
+      per_point: 3 / 100
     }
   ],
   [
@@ -98,7 +99,7 @@ const BM_TREE = [
       abrv: 'animal_handler',
       max: 2,
       is_modifier: true,
-      per_point: 5
+      per_point: 5 / 100
     },
     {
       name: 'Frenzy',
@@ -145,6 +146,7 @@ const BM_TREE = [
       name: "Longevity",
       abrv: 'longevity',
       max: 3,
+      per_point: 10 / 100
     },
     {
       name: 'The Beast Within',
@@ -155,7 +157,7 @@ const BM_TREE = [
       name: "Cobra Strikes",
       abrv: 'cobra_strike',
       max: 3,
-      per_point: 20
+      per_point: 20 / 100
     }
   ],
   [
@@ -199,7 +201,7 @@ const MM_TREE = [
       name: 'Careful Aim',
       abrv: 'careful_aim',
       max: 3,
-      per_point: 33 / 100
+      per_point: 3333 / 10000
     },
     {
       name: "Improved Hunter's Mark",
@@ -227,7 +229,6 @@ const MM_TREE = [
       name: 'Improved Arcane Shot',
       abrv: 'imp_arc_shot',
       max: 3,
-      is_modifier: true,
       per_point: 5 / 100
     },
     {
@@ -239,6 +240,7 @@ const MM_TREE = [
       name: 'Rapid Killing',
       abrv: 'rapid_killing',
       max: 2,
+      per_point: 60
     }
   ],
   [
@@ -246,14 +248,12 @@ const MM_TREE = [
       name: 'Improved Stings',
       abrv: 'imp_stings',
       max: 3,
-      is_modifier: true,
       per_point: 10 / 100
     },
     {
       name: 'Efficiency',
       abrv: 'efficiency',
       max: 5,
-      is_modifier: true,
       per_point: 3 / 100
     }
   ],
@@ -272,7 +272,6 @@ const MM_TREE = [
       name: 'Barrage',
       abrv: 'barrage',
       max: 3,
-      is_modifier: true,
       per_point: 4 / 100
     }
   ],
@@ -281,13 +280,14 @@ const MM_TREE = [
       name: 'Combat Experience',
       abrv: 'combat_exp',
       max: 2,
+      is_modifier: true,
+      per_point: 2 / 100
     },
     {
       name: 'Ranged Weapon Specialization',
       abrv: 'ranged_weap_spec',
       max: 3,
-      is_modifier: true,
-      per_point: 1 / 100
+      per_point: 1.9 / 100
     }
   ],
   [
@@ -321,7 +321,8 @@ const MM_TREE = [
     {
       name: 'Rapid Recuperation',
       abrv: 'rapid_recup',
-      max: 5,
+      max: 2,
+      per_point: 2 / 100
     }
   ],
   [
@@ -348,7 +349,6 @@ const MM_TREE = [
       name: 'Marked for Death',
       abrv: 'mark_death',
       max: 5,
-      is_modifier: true,
       per_point: 1 / 100
     },
   ],
@@ -437,7 +437,6 @@ const SV_TREE = [
       name: 'T.N.T.',
       abrv: 't_n_t',
       max: 3,
-      is_modifier: true,
       per_point: 2 / 100
     },
     {
@@ -524,7 +523,7 @@ const SV_TREE = [
       name: 'Sniper Training',
       abrv: 'sniper_training',
       max: 3,
-      per_point: 5 / 100
+      per_point: 1 / 100
     }
   ],
   [
@@ -580,7 +579,7 @@ function parseTalents(talentString) {
 }
 
 const BM_ImpHM_Track = parseTalents('51200201515012243100531151-0050352-5')
-const MM_ImpHM_FA_Track = parseTalents('502-035335001230013233135031351-5')
+const MM_ImpHM_FA_Track = parseTalents('-035005231235010033105001351') //502-035335001230013233135031351-5
 const MM_ImpAS_FA_Track = parseTalents('502-035305131030013233135030351-5000002')
 const SV_FA_Resrc_Aimed = parseTalents('-035305001-5000032500033330533035001331')
 const BM_FA_Track = parseTalents('51200201515012243100531151-0350052-5')

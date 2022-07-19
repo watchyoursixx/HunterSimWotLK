@@ -403,7 +403,9 @@ const PET_CDS = {
     killcommand: {
         effect: {
             duration: 30,
-            base_cd: 60
+            base_cd: 60,
+            stacks: 3,
+            dmgmod: 20
         },
         effect_name: 'Kill Command'
     },
@@ -446,6 +448,7 @@ const PET_PROCS = {
     cullingherd: { // todo
         effect: {
             duration: 10,
+            dmgbonus: 1,
         },
         effect_name: 'Culling the Herd'
     },
@@ -454,12 +457,6 @@ const PET_PROCS = {
             duration: 8,
         },
         effect_name: 'Frenzy'
-    },
-    savagerend: { // todo
-        effect: {
-            duration: 30,
-        },
-        effect_name: 'Savage Rend'
     },
     monstrousbite: { // todo
         effect: {
@@ -1263,7 +1260,6 @@ const TALENT_PROCS = {
         effect: {
             is_proc: true,
             proc_type: 'Steady',
-            proc_chance: 5,
             duration: 12,
         },
         effect_name: 'Improved Steady Shot'
@@ -1299,11 +1295,10 @@ const TALENT_PROCS = {
         effect_name: 'Lock and Load'
     },
     pierce_shot: {
-        shares_cd: false,
+        type: 'bleed',
         effect: {
-            is_proc: true,
-            proc_type: 'Special',
-            duration: 8
+            duration: 8,
+            tick_rate: 1
         },
         effect_name: 'Piercing Shots'
     },
@@ -1316,6 +1311,51 @@ const TALENT_PROCS = {
         },
         effect_name: 'Replenishment'
     },
+}
+
+const AURA_DOTS = {
+
+    blackarrow: {
+        type: 'shadow',
+        effect: {
+            tick_rate: 3,
+            duration: 15
+        },
+        effect_name: 'Black Arrow'
+    },
+    serpentsting: {
+        type: 'nature',
+        effect: {
+            tick_rate: 3,
+            duration: 15
+        },
+        effect_name: 'Serpent Sting'
+    },
+    immolatetrap: {
+        type: 'fire',
+        effect: {
+            tick_rate: 3,
+            duration: 15
+        },
+        effect_name: 'Immolation Trap'
+    },
+    explosivetrap: {
+        type: 'fire',
+        effect: {
+            tick_rate: 2,
+            duration: 20
+        },
+        effect_name: 'Explosive Trap'
+    },
+    explosiveshot: {
+        type: 'fire',
+        effect: {
+            tick_rate: 1,
+            duration: 2
+        },
+        effect_name: 'Explosive Shot'
+    },
+
 }
 
 var auras = {};
@@ -1331,7 +1371,7 @@ const aura_template = { timer: 0, cd: 0, uptime: 0 };
 
 var usable_CDs = {
 
-    beastwithin: { enable: true, offset: 0, type: 'player'},
+    beastwithin: { enable: false, offset: 0, type: 'player'},
     readiness: { enable: true, offset: 0, type: 'player' },
     rapid: { enable: true, offset: 0, type: 'player' },
     rune: { enable: true, offset: 0, type: 'player' },
@@ -1360,7 +1400,7 @@ function updateUsableCDs() {
     let profession_2 = 'Leatherworking';
 
     if (selectedRace == 3) { // orc
-        usable_CDs.bloodfury.enable = true;
+        usable_CDs.bloodfury.enable = false; // fixme
         usable_CDs.berserking.enable = false;
         usable_CDs.arcanetorrent.enable = false;
 
@@ -1541,10 +1581,14 @@ function buildAurasObj(){
             auras[aura_] = JSON.parse(JSON.stringify(aura_template));
             auras[aura_].stat_type = (!!cd_obj[aura_].stat_type) ? cd_obj[aura_].stat_type : '';
             auras[aura_].effect = cd_obj[aura_].effect;
-            auras[aura_].offset = cd_obj[aura_].offset;
+            auras[aura_].offset = usable_CDs[aura_].offset;
             auras[aura_].effect_name = cd_obj[aura_].effect_name;
+            if (aura_ === 'killcommand') {
+                auras[aura_].stacks = 0;
+            }
         }
     }
+    
     // updates auras with talent procs
     for (let talent_ in TALENT_PROCS) {
         if (talents[talent_] > 0) {
@@ -1552,13 +1596,22 @@ function buildAurasObj(){
             auras[talent_].stat_type = (!!TALENT_PROCS[talent_].stat_type) ? TALENT_PROCS[talent_].stat_type : '';
             auras[talent_].effect = TALENT_PROCS[talent_].effect;
             auras[talent_].effect_name = TALENT_PROCS[talent_].effect_name;
+            if (talent_ === 'pierce_shot') {
+                auras[talent_].apply_time = 0;
+                auras[talent_].next_tick = 0;
+                auras[talent_].ticks = 0;
+                auras[talent_].type = TALENT_PROCS[talent_].type;
+                auras[talent_].damage = 0;
+            }
         }
     }
     // updates auras with pet procs
     for (let aura_ in PET_PROCS) {
         let checkaura = false;
         if (((aura_ === 'cullingherd') && (pet_talents.cull_herd > 1)) ||
-        ((aura_ === 'frenzy') && (talents.frenzy > 0)) || ((aura_ === 'savagerend') && (selectedPet === 2))) { 
+            ((aura_ === 'frenzy') && (talents.frenzy > 0)) ||
+            ((aura_ === 'savagerend') && (selectedPet === 2)) ||
+            ((aura_ === 'monstrousbite') && (selectedPet === 24))) { 
             checkaura = true;
         }
         if (checkaura) {
@@ -1566,6 +1619,9 @@ function buildAurasObj(){
             auras[aura_].stat_type = (!!PET_PROCS[aura_].stat_type) ? PET_PROCS[aura_].stat_type : '';
             auras[aura_].effect = PET_PROCS[aura_].effect;
             auras[aura_].effect_name = PET_PROCS[aura_].effect_name;
+            if((aura_ === 'monstrousbite') && (selectedPet === 24)) {
+                auras[aura_].stacks = 0;
+            }
         }
     }
     // updates auras with set procs
@@ -1580,7 +1636,39 @@ function buildAurasObj(){
             auras[aura_].effect_name = SET_PROCS[aura_].effect_name;
         }
     }
+
+    // updates auras with dots
+    for (let aura_ in AURA_DOTS) {
+        let checkaura = false;
+        
+        if(settings[aura_]) checkaura = true;
+        
+        if (checkaura){
+            auras[aura_] = JSON.parse(JSON.stringify(aura_template));
+            //auras[aura_].stat_type = '';
+            auras[aura_].effect = AURA_DOTS[aura_].effect;
+            auras[aura_].effect_name = AURA_DOTS[aura_].effect_name;
+            auras[aura_].type = AURA_DOTS[aura_].type;
+            auras[aura_].apply_time = 0;
+            auras[aura_].next_tick = 0;
+            auras[aura_].ticks = 0;
+            auras[aura_].damage = 0;
+        }
+    }
     
+    if (!!PET_SPELLS.pet_special.tick_rate) {
+        auras.pet_special = JSON.parse(JSON.stringify(aura_template));
+        auras.pet_special.effect = {};
+        auras.pet_special.effect.duration = PET_SPELLS.pet_special.duration;
+        auras.pet_special.effect.tick_rate = PET_SPELLS.pet_special.tick_rate;
+        auras.pet_special.effect_name = PET_SPELLS.pet_special.spell_name;
+        auras.pet_special.type = PET_SPELLS.pet_special.type;
+        auras.pet_special.apply_time = 0;
+        auras.pet_special.next_tick = 0;
+        auras.pet_special.ticks = 0;
+        auras.pet_special.damage = 0;
+    }
+
     Object.filter = (obj, predicate) => Object.fromEntries(Object.entries(obj).filter(predicate));
 
     ap_auras = Object.filter(auras, ([key, obj]) => obj.stat_type === 'AP')

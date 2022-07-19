@@ -52,7 +52,7 @@ function selectedOptionsResults(){
     displayStats();
     gearSlotsDisplay();
     storeData();
-    console.log('options');
+
 }
 
 function auraUptimeSettings(){
@@ -478,7 +478,7 @@ function petfoodSelection() {
 // 0 for night elf, 1 for dwarf, 2 for draenei, 3 for orc, 4 for troll, 5 for tauren, 6 for blood elf
 function getRace() {
     selectedRace = parseInt(document.getElementById("race").value);
-    document.getElementById("racedisplay").innerHTML = races[selectedRace].name;
+    document.getElementById("racedisplay").innerHTML = races[selectedRace][level].name;
     selectedOptionsResults();
 }
 
@@ -493,15 +493,15 @@ function selectTalents(talent){
 
     
     let customtalentlink = document.getElementById("customtalent").value;
-    let regioncheck = customtalentlink.substr(0,13);
+    let regioncheck = customtalentlink.substr(0,30);
     let customtalents = "";
-    if(regioncheck !== "https://wotlk") {
-        customtalents = customtalentlink.slice(50);
+    if(regioncheck !== "https://www.wowhead.com/wotlk/") {
+        customtalents = customtalentlink.slice(51);
     }
     else {
-        customtalents = customtalentlink.slice(45);
+        customtalents = customtalentlink.slice(49);
     }
-    console.log(customtalents)
+    
     switch (talent) {
         case "6":
             talents = BM_ImpHM_Track;

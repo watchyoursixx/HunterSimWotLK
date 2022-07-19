@@ -26,26 +26,26 @@ var preferredGems = {
 }
 
 var hitCap = 142;
-var ArmorPenCap = 10000;
+var ArPRatingCap = 1400;
 var base_link = "https://wotlkdb.com/"
 var equippedStats = {
-    head: {hit: 0, arp: 0},
-    neck: {hit: 0, arp: 0},
-    shoulder: {hit: 0, arp: 0},
-    back: {hit: 0, arp: 0},
-    chest: {hit: 0, arp: 0},
-    wrist: {hit: 0, arp: 0},
-    mainhand: {hit: 0, arp: 0},
-    offhand: {hit: 0, arp: 0},
-    hand: {hit: 0, arp: 0},
-    waist: {hit: 0, arp: 0},
-    leg: {hit: 0, arp: 0},
-    feet: {hit: 0, arp: 0},
-    ring1: {hit: 0, arp: 0},
-    ring2: {hit: 0, arp: 0},
-    trinket1: {hit: 0, arp: 0},
-    trinket2: {hit: 0, arp: 0},
-    range: {hit: 0, arp: 0}
+    head: {hit: 0, arp: 0, agi: 0},
+    neck: {hit: 0, arp: 0, agi: 0},
+    shoulder: {hit: 0, arp: 0, agi: 0},
+    back: {hit: 0, arp: 0, agi: 0},
+    chest: {hit: 0, arp: 0, agi: 0},
+    wrist: {hit: 0, arp: 0, agi: 0},
+    mainhand: {hit: 0, arp: 0, agi: 0},
+    offhand: {hit: 0, arp: 0, agi: 0},
+    hand: {hit: 0, arp: 0, agi: 0},
+    waist: {hit: 0, arp: 0, agi: 0},
+    leg: {hit: 0, arp: 0, agi: 0},
+    feet: {hit: 0, arp: 0, agi: 0},
+    ring1: {hit: 0, arp: 0, agi: 0},
+    ring2: {hit: 0, arp: 0, agi: 0},
+    trinket1: {hit: 0, arp: 0, agi: 0},
+    trinket2: {hit: 0, arp: 0, agi: 0},
+    range: {hit: 0, arp: 0, agi: 0}
 }
 
 const trinketDPS = [
@@ -655,7 +655,7 @@ function getStatsCapData(){
     else hitCap = 142;
 
     // ARP cap calculation
-    ArmorPenCap = 100 * ArPRatingRatio;
+    ArPRatingCap = 100 * ArPRatingRatio;
     
     for (let slot in equippedStats) {
         let SLOT_DATA = GEAR_MAP[slot];
@@ -669,6 +669,7 @@ function getStatsCapData(){
             
                 equippedStats[slot].hit = (!!ITEM_DATA.stats.Hit) ? ITEM_DATA.stats.Hit : 0;
                 equippedStats[slot].arp = (!!ITEM_DATA.stats.ArP) ? ITEM_DATA.stats.ArP : 0;
+                equippedStats[slot].agi = (!!ITEM_DATA.stats.Agi) ? ITEM_DATA.stats.Agi : 0;
             }
         }
     }
@@ -720,7 +721,7 @@ function estimateDps(item, weights) {
             else if (stat === "ArP") {
 
                 let currentarp = ArPRating - equippedStats[activeslot].arp;
-                usedValue = currentarp < ArmorPenCap ? Math.min(ArmorPenCap - currentarp, value) : 0;
+                usedValue = currentarp < ArPRatingCap ? Math.min(ArPRatingCap - currentarp, value) : 0;
             }
             return acc + (weights[stat] || 0) * usedValue
           }, 0)

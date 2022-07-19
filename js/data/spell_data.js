@@ -1,21 +1,17 @@
 const AIMED_SHOT = {
     base: {
         cost: 8,
-        cast: 0.00001,
+        base_cast: 0.0001,
         base_cd: 10,
         gcd: true,
         spell_name: 'Aimed Shot',
         type: 'physical'
     },
-    7: {
+    1: {
         rankdmg: 205,
         level: 70
     },
-    8: {
-        rankdmg: 345,
-        level: 80
-    },
-    9: {
+    2: {
         rankdmg: 408,
         level: 80
     },
@@ -23,21 +19,17 @@ const AIMED_SHOT = {
 const ARCANE_SHOT = {
     base: {
         cost: 5,
-        cast: 0.00001,
+        base_cast: 0.0001,
         base_cd: 6,
         gcd: true,
         spell_name: 'Arcane Shot',
         type: 'arcane'
     },
-    9: {
+    1: {
         rankdmg: 273,
         level: 70
     },
-    10: {
-        rankdmg: 402,
-        level: 80
-    },
-    11: {
+    2: {
         rankdmg: 492,
         level: 80
     },
@@ -45,7 +37,7 @@ const ARCANE_SHOT = {
 const BLACK_ARROW = {
     base: {
         cost: 6,
-        cast: 0.00001,
+        base_cast: 0.0001,
         duration: 15,
         ticks: 3,
         base_cd: 30,
@@ -53,15 +45,11 @@ const BLACK_ARROW = {
         spell_name: 'Black Arrow',
         type: 'shadow'
     },
-    7: {
+    1: {
         rankdmg: 296,
         level: 70
     },
-    8: {
-        rankdmg: 448,
-        level: 80
-    },
-    9: {
+    2: {
         rankdmg: 553,
         level: 80
     },
@@ -69,7 +57,7 @@ const BLACK_ARROW = {
 const CHIMERA_SHOT = {
     base: {
         cost: 12,
-        cast: 0.00001,
+        base_cast: 0.0001,
         base_cd: 10,
         gcd: true,
         spell_name: 'Chimera Shot',
@@ -83,7 +71,7 @@ const CHIMERA_SHOT = {
 const EXPLOSIVE_SHOT = {
     base: {
         cost: 7,
-        cast: 0.00001,
+        base_cast: 0.0001,
         duration: 2,
         ticks: 1,
         base_cd: 6,
@@ -91,17 +79,12 @@ const EXPLOSIVE_SHOT = {
         spell_name: 'Explosive Shot',
         type: 'fire'
     },
-    2: {
+    1: {
         min_rankdmg: 221,
         max_rankdmg: 265,
         level: 70
     },
-    3: {
-        min_rankdmg: 325,
-        max_rankdmg: 391,
-        level: 80
-    },
-    4: {
+    2: {
         min_rankdmg: 386,
         max_rankdmg: 464,
         level: 80
@@ -110,7 +93,7 @@ const EXPLOSIVE_SHOT = {
 const EXPLOSIVE_TRAP = {
     base: {
         cost: 19,
-        cast: 0.00001,
+        base_cast: 0.0001,
         duration: 20,
         ticks: 2,
         base_cd: 30,
@@ -118,19 +101,13 @@ const EXPLOSIVE_TRAP = {
         spell_name: 'Explosive Trap',
         type: 'fire'
     },
-    4: {
+    1: {
         min_rankdmg: 263,
         max_rankdmg: 337,
         dot_dmg: 45,
         level: 70
     },
-    5: {
-        min_rankdmg: 434,
-        max_rankdmg: 556,
-        dot_dmg: 74,
-        level: 80
-    },
-    6: {
+    2: {
         min_rankdmg: 523,
         max_rankdmg: 671,
         dot_dmg: 90,
@@ -140,7 +117,7 @@ const EXPLOSIVE_TRAP = {
 const IMMOLATION_TRAP = {
     base: {
         cost: 9,
-        cast: 0.00001,
+        base_cast: 0.0001,
         duration: 15,
         ticks: 3,
         base_cd: 30,
@@ -148,15 +125,11 @@ const IMMOLATION_TRAP = {
         spell_name: 'Immolation Trap',
         type: 'fire'
     },
-    6: {
+    1: {
         rankdmg: 197,
         level: 70
     },
-    7: {
-        rankdmg: 308,
-        level: 80
-    },
-    8: {
+    2: {
         rankdmg: 377,
         level: 80
     },
@@ -164,7 +137,7 @@ const IMMOLATION_TRAP = {
 const KILL_SHOT = {
     base: {
         cost: 7,
-        cast: 0.00001,
+        base_cast: 0.0001,
         base_cd: 20,
         gcd: true,
         spell_name: 'Kill Shot',
@@ -175,10 +148,6 @@ const KILL_SHOT = {
         level: 80
     },
     2: {
-        rankdmg: 250,
-        level: 80
-    },
-    3: {
         rankdmg: 325,
         level: 80
     },
@@ -186,17 +155,17 @@ const KILL_SHOT = {
 const MONGOOSE_BITE = {
     base: {
         cost: 3,
-        cast: 0.00001,
+        base_cast: 0.0001,
         base_cd: 5,
         gcd: true,
         spell_name: 'Mongoose Bite',
         type: 'physical'
     },
-    5: {
+    1: {
         rankdmg: 150,
         level: 70
     },
-    6: {
+    2: {
         rankdmg: 280,
         level: 80
     },
@@ -204,21 +173,17 @@ const MONGOOSE_BITE = {
 const MULTI_SHOT = {
     base: {
         cost: 9,
-        cast: 0.5,
+        base_cast: 0.5,
         base_cd: 10,
         gcd: true,
         spell_name: 'Multi Shot',
         type: 'physical'
     },
-    6: {
+    1: {
         rankdmg: 205,
         level: 70
     },
-    7: {
-        rankdmg: 333,
-        level: 80
-    },
-    8: {
+    2: {
         rankdmg: 408,
         level: 80
     },
@@ -226,21 +191,17 @@ const MULTI_SHOT = {
 const RAPTOR_STRIKE = {
     base: {
         cost: 4,
-        cast: 0.00001,
+        base_cast: 0.0001,
         base_cd: 6,
         gcd: false,
         spell_name: 'Raptor Strike',
         type: 'physical'
     },
-    9: {
+    1: {
         rankdmg: 170,
         level: 70
     },
-    10: {
-        rankdmg: 275,
-        level: 80
-    },
-    11: {
+    2: {
         rankdmg: 335,
         level: 80
     },
@@ -248,22 +209,18 @@ const RAPTOR_STRIKE = {
 const SERPENT_STING = {
     base: {
         cost: 9,
-        cast: 0.00001,
+        base_cast: 0,
         duration: 15,
         ticks: 3,
         gcd: true,
         spell_name: 'Serpent Sting',
         type: 'nature'
     },
-    10: {
+    1: {
         rankdmg: 132,
         level: 70
     },
-    11: {
-        rankdmg: 198,
-        level: 80
-    },
-    12: {
+    2: {
         rankdmg: 242,
         level: 80
     },
@@ -271,7 +228,7 @@ const SERPENT_STING = {
 const SILENCING_SHOT = {
     base: {
         cost: 6,
-        cast: 0.00001,
+        base_cast: 0.0001,
         base_cd: 20,
         gcd: false,
         spell_name: 'Silencing Shot',
@@ -281,7 +238,7 @@ const SILENCING_SHOT = {
 const SCATTER_SHOT = {
     base: {
         cost: 8,
-        cast: 0.00001,
+        base_cast: 0.0001,
         base_cd: 30,
         gcd: true,
         spell_name: 'Scatter Shot',
@@ -291,20 +248,16 @@ const SCATTER_SHOT = {
 const STEADY_SHOT = {
     base: {
         cost: 5,
-        cast: 2,
+        base_cast: 2,
         gcd: true,
         spell_name: 'Steady Shot',
         type: 'physical'
     },
-    2: {
+    1: {
         rankdmg: 108,
         level: 70
     },
-    3: {
-        rankdmg: 198,
-        level: 80
-    },
-    4: {
+    2: {
         rankdmg: 252,
         level: 80
     },
@@ -312,22 +265,18 @@ const STEADY_SHOT = {
 const VOLLEY = {
     base: {
         cost: 17,
-        cast: 0.00001,
+        base_cast: 0.0001,
         duration: 6,
         ticks: 1,
         gcd: true,
         spell_name: 'Volley',
         type: 'arcane'
     },
-    4: {
+    1: {
         rankdmg: 168,
         level: 70
     },
-    5: {
-        rankdmg: 290,
-        level: 80
-    },
-    6: {
+    2: {
         rankdmg: 353,
         level: 80
     },
@@ -335,7 +284,7 @@ const VOLLEY = {
 const FROST_TRAP = {
     base: {
         cost: 2,
-        cast: 0.00001,
+        base_cast: 0.0001,
         base_cd: 30,
         gcd: true,
         spell_name: 'Frost Trap',
@@ -345,7 +294,7 @@ const FROST_TRAP = {
 const SNAKE_TRAP = {
     base: {
         cost: 9,
-        cast: 0.00001,
+        base_cast: 0.0001,
         base_cd: 30,
         gcd: true,
         spell_name: 'Snake Trap',
@@ -377,6 +326,48 @@ var SPELLS = {
     scattershot: {enable:false, cast:0.0001, cd: 0, dmg:0, cost:120, rankdmg:170,gcd:false},
 
 };
+
+function generateSpellData(){
+
+    SPELLS = {
+    
+        autoshot: { cast:0, cd:0 },
+
+    }
+    console.log(level);
+    for (spell in SPELL_DATA_MAPPER) {
+        let spellname = SPELL_DATA_MAPPER[spell];
+        SPELLS[spell] = spellname.base;
+        if(!!spellname['2']) {
+            SPELLS[spell].ranks = (level === 70) ? spellname['1'] : spellname['2'];
+        }
+        SPELLS[spell].cd = 0;
+        SPELLS[spell].cast = 0;
+    }
+
+}
+
+settings = {
+    autoshot: true,
+    multishot: true,
+    aimedshot: true,
+    chimerashot: true,
+    steadyshot: true,
+    arcaneshot: true,
+    serpentsting: true,
+
+}
+function buildSpellsObj() {
+
+    generateSpellData();
+
+    for (let spell in SPELLS) {
+        let enabled = settings[spell];
+        if (enabled) {
+            USED_SPELLS[spell] = SPELLS[spell];
+        }
+    }
+}
 
 SPELL_DATA_MAPPER = {
     aimedshot: AIMED_SHOT,

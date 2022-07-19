@@ -122,7 +122,7 @@
                   
                   <a href="javascript:;" id="settingsbtn" class="u-border-2 u-border-black u-border-hover-black u-btn u-btn-round u-button-style u-custom-color-2 u-hover-white u-radius-5 u-btn-1">Settings</a>
                   <a href="javascript:;" onclick="statWeightLoop()"class="u-border-2 u-border-black u-border-hover-black u-btn u-btn-round u-button-style u-custom-color-2 u-hover-white u-radius-5 u-btn-2">Sim EP<div class="weightloadbar" id="weightloadbar"></div></a>
-                  <a href="javascript:;" onclick="startSync()" id="simdps" class="u-border-2 u-border-black u-border-hover-black u-btn u-btn-round u-button-style u-custom-color-2 u-hover-white u-radius-5 u-btn-3">Sim DPS<div class="loadbar" id="loadbar"></div></a>
+                  <a href="javascript:;" onclick="startStepOnly()" id="simdps" class="u-border-2 u-border-black u-border-hover-black u-btn u-btn-round u-button-style u-custom-color-2 u-hover-white u-radius-5 u-btn-3">Sim DPS<div class="loadbar" id="loadbar"></div></a>
                   <a href="javascript:;" onclick="combatLogDisplay()" onmouseover="combatLogDisplay()" id="logbtn" class="u-border-2 u-border-black u-border-hover-black u-btn u-btn-round u-button-style u-custom-color-2 u-hover-white u-radius-5 u-btn-6">Combat Log</a>
                   <div class="dps-result">
                     <p class="u-align-right u-text u-text-custom-color-7 u-text-18 u-text-1819" id="dpsresult">2000.1</p>
@@ -1047,12 +1047,12 @@
         <li>
           <label class="label-3">Preset Talent Options</label>
             <select id="talentselect" onchange="selectTalents(this.value)" class="select hover-grey select-relative">
-              <option selected value="6">BM 41/20/0</option>
-              <option value="5">SV 0/20/41</option>
-              <option value="4">SV 7/20/34</option>
-              <option value="3">SV 5/20/36</option>
-              <option value="2">SV 0/27/34</option>
-              <option value="1">MM 17/44/0</option>
+              <option selected value="6">BM Imp HM Tracking</option>
+              <option value="5">MM ImpHM Focused Aim</option>
+              <option value="4">MM ImpArcane Focused Aim</option>
+              <option value="3">SV Focused Aim Resrc Aimed Shot</option>
+              <option value="2">BM Focused Aim Tracking</option>
+              <option value="1">BM Focused Aim Tracking</option>
               <option value="0">Custom link (see below)</option>
             </select>
         </li>
